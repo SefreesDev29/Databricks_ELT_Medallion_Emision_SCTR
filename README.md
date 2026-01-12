@@ -1,7 +1,7 @@
 # 🚀 Pipeline ETL Emisión SCTR - Databricks Medallion Architecture
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Databricks](https://img.shields.io/badge/Databricks-Runtime%2015.x-FF3621?style=for-the-badge&logo=databricks&logoColor=white)](https://databricks.com/)
+[![Databricks](https://img.shields.io/badge/Databricks-Runtime%2016.x-FF3621?style=for-the-badge&logo=databricks&logoColor=white)](https://databricks.com/)
 [![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.5-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/)
 [![VS Code](https://img.shields.io/badge/VS%20Code-Databricks%20Connect-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
