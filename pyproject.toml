@@ -8,6 +8,7 @@ dependencies = [
     "databricks-connect>=16.1.7",
     "databricks-sdk>=0.77.0",
     "fastexcel>=0.18.0",
+    "ipykernel>=7.1.0",
     "loguru>=0.7.3",
     "pandas>=2.3.3",
 ]
