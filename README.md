@@ -39,32 +39,14 @@ Utiliza un flujo de trabajo híbrido donde el desarrollo y control de versiones 
 
 Sigue estos pasos si estás clonando este repositorio por primera vez.
 
-### 1. Configuración en Databricks
-1.  Generar un **Personal Access Token (PAT)**:
-    * Ir a *User Settings* -> *Developer* -> *Access Tokens* -> *Generate New Token*.
-    * Guardar el token , se necesitará para conectar VS Code.
-2.  Tener un Clúster encendido para desarrollo.
+### 1. Clonar y Preparar Entorno (uv)
+1.  Clonar el repositorio
 
-### 2. Configuración Local (VS Code)
-1.  Instalar la extensión: **Databricks for Visual Studio Code**.
-2.  Configurar la autenticación:
-    * Clic en el icono de Databricks en la barra lateral.
-    * Seleccionar **Configure Databricks**.
-    * Ingresar la URL del Workspace y el Token generado.
-    * Seleccionar el **Cluster** objetivo.
-    * Esto generará un perfil en (ej. `Emision_SCTR_Databricks`).
-    * Dirigirse src/utilities.py y Forzar la variable de entorno antes de crear la sesión Spark.
-
-```python
-    import os
-    from pyspark.sql import SparkSession
-
-    os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks' #Ejemplo de Profile
-    spark = SparkSession.builder.getOrCreate()
+```sh
+git clone [https://github.com/SefreesDev29/Databricks_ELT_Medallion_Emision_SCTR.git](https://github.com/SefreesDev29/Databricks_ELT_Medallion_Emision_SCTR.git)
 ```
 
-### 3. Instalación de Dependencias
-Este proyecto usa `uv` para la gestión de paquetes. Instala las librerías necesarias para que el linter local y Jupyter funcionen:
+2.  Este proyecto utiliza `uv` para la gestión de dependencias. Instala las librerías necesarias para que el linter local y Jupyter funcionen:
 
 ```sh
 # Sincronizar entorno virtual
@@ -72,4 +54,28 @@ uv sync
 
 # O instalar manualmente las dependencias clave
 uv add databricks-connect databricks-sdk ipykernel
+```
+
+### 2. Configuración en Databricks
+1.  Generar un **Personal Access Token (PAT)**:
+    * Ir a *User Settings* -> *Developer* -> *Access Tokens* -> *Generate New Token*.
+    * Guardar el token , se necesitará para conectar VS Code.
+2.  Tener un Clúster encendido para desarrollo.
+
+### 3. Configuración Local (VS Code)
+1.  Instalar la extensión: **Databricks for Visual Studio Code**.
+2.  Configurar la autenticación:
+    * Clic en el icono de Databricks en la barra lateral.
+    * Seleccionar **Configure Databricks**.
+    * Ingresar la URL del Workspace y el Token generado.
+    * Seleccionar el **Cluster** objetivo.
+    * Esto generará un perfil en (ej. `Emision_SCTR_Databricks`).
+    * Dirigirse al archivo `src/utilities.py` y forzar la variable de entorno antes de crear la sesión Spark.
+
+```python
+    import os
+    from pyspark.sql import SparkSession
+
+    os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks' #Ejemplo de Profile
+    spark = SparkSession.builder.getOrCreate()
 ```
