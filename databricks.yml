@@ -1,0 +1,19 @@
+# This is a Databricks asset bundle definition for Proyecto_ETL_Emision_SCTR_Databricks.
+# The Databricks extension requires databricks.yml configuration file.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+
+bundle:
+  name: Proyecto_ETL_Emision_SCTR_Databricks
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-6bd4bd13-6bec.cloud.databricks.com
+
+  ## Optionally, there could be 'staging' or 'prod' targets here.
+  #
+  # prod:
+  #   workspace:
+  #     host: https://dbc-6bd4bd13-6bec.cloud.databricks.com

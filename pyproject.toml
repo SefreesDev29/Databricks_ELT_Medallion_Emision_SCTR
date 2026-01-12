@@ -1,0 +1,13 @@
+[project]
+name = "proyecto-etl-emision-sctr-databricks"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "databricks-connect>=16.1.7",
+    "databricks-sdk>=0.77.0",
+    "fastexcel>=0.18.0",
+    "loguru>=0.7.3",
+    "pandas>=2.3.3",
+]
