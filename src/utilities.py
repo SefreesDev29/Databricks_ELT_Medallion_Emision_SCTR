@@ -20,7 +20,7 @@ try:
 except ImportError:
     pass
 
-spark = SparkSession.builder.getOrCreate()
+# spark = SparkSession.builder.getOrCreate()
 
 # os.environ['TZ'] = 'America/Lima'
 # time.tzset()
