@@ -74,17 +74,17 @@ uv add databricks-connect databricks-sdk ipykernel
 
 ```python
 import os
+from pyspark.sql import SparkSession
 
 ws = None
 IS_CLOUD = os.getenv('DATABRICKS_RUNTIME_VERSION') is not None
 
 if not IS_CLOUD:
-    from pyspark.sql import SparkSession
     os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks'
-    
     from databricks.sdk.runtime import dbutils
     from databricks.sdk import WorkspaceClient
     from databricks.sdk.errors import ResourceDoesNotExist
-    spark = SparkSession.builder.getOrCreate()
     ws = WorkspaceClient()
+
+spark = SparkSession.builder.getOrCreate()
 ```
