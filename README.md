@@ -73,9 +73,18 @@ uv add databricks-connect databricks-sdk ipykernel
     * Dirigirse al archivo `src/utilities.py` y forzar la variable de entorno antes de crear la sesión Spark.
 
 ```python
-    import os
-    from pyspark.sql import SparkSession
+import os
 
-    os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks' #Ejemplo de Profile
+ws = None
+IS_CLOUD = os.getenv('DATABRICKS_RUNTIME_VERSION') is not None
+
+if not IS_CLOUD:
+    from pyspark.sql import SparkSession
+    os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks'
+    
+    from databricks.sdk.runtime import dbutils
+    from databricks.sdk import WorkspaceClient
+    from databricks.sdk.errors import ResourceDoesNotExist
     spark = SparkSession.builder.getOrCreate()
+    ws = WorkspaceClient()
 ```

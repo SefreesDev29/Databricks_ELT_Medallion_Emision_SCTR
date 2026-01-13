@@ -13,17 +13,19 @@ from pyspark.sql import functions as F
 from pyspark.sql.types import IntegerType, DecimalType, StringType, StructType, StructField, LongType
 from pyspark.sql import DataFrame
 from delta.tables import DeltaTable
-from pyspark.sql import SparkSession
-try:
+
+ws = None
+IS_CLOUD = os.getenv('DATABRICKS_RUNTIME_VERSION') is not None
+
+if not IS_CLOUD:
+    from pyspark.sql import SparkSession
+    os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks'
+
     from databricks.sdk.runtime import dbutils
     from databricks.sdk import WorkspaceClient
     from databricks.sdk.errors import ResourceDoesNotExist
-except ImportError:
-    pass
-
-os.environ['DATABRICKS_CONFIG_PROFILE'] = 'Emision_SCTR_Databricks'
-spark = SparkSession.builder.getOrCreate()
-ws = WorkspaceClient()
+    spark = SparkSession.builder.getOrCreate()
+    ws = WorkspaceClient()
 
 # os.environ['TZ'] = 'America/Lima'
 # time.tzset()
@@ -93,15 +95,21 @@ def custom_format_log(type_process: int):
 def upload_log_to_volume():
     if LOCAL_LOG_PATH and os.path.exists(LOCAL_LOG_PATH):
         try:
-            with open(LOCAL_LOG_PATH, 'rb') as f:
-                ws.files.upload(REMOTE_LOG_PATH, f, overwrite=True)
+            if IS_CLOUD:
+                shutil.copy2(LOCAL_LOG_PATH, REMOTE_LOG_PATH)
+            else:
+                with open(LOCAL_LOG_PATH, 'rb') as f:
+                    ws.files.upload(REMOTE_LOG_PATH, f, overwrite=True)
         except:
             pass
 
 def _sync_worker():
     while not _STOP_SYNC:
         upload_log_to_volume()
-        time.sleep(15) 
+        if IS_CLOUD:
+            time.sleep(5) 
+        else:
+            time.sleep(15)
 
 def clear_local_log():
     global LOCAL_LOG_PATH,LOG_NAME
@@ -129,21 +137,32 @@ def open_log(layer_name : str):
     REMOTE_LOG_PATH = f"{BASE_VOLUME_PATH}/Logs/{LOG_NAME}"
     EXIST_LOG = False
 
-    try:
-        try:
-            ws.files.get_metadata(REMOTE_LOG_PATH)
+    if IS_CLOUD:
+        if Path(REMOTE_LOG_PATH).exists():
             print(f"🔄 Historial detectado en Volumen. Restaurando '{LOG_NAME}' a local...")
-            EXIST_LOG = True
-        except Exception as e:
+            try:
+                shutil.copy2(REMOTE_LOG_PATH, LOCAL_LOG_PATH)
+            except Exception as e:
+                print(f"⚠️ No se pudo restaurar log previo: {e}")
+                clear_local_log()
+        else:
             clear_local_log()
-        
-        if EXIST_LOG:
-            response = ws.files.download(REMOTE_LOG_PATH) 
-            with open(LOCAL_LOG_PATH, 'wb') as f_local:
-                shutil.copyfileobj(response.contents, f_local)        
-    except Exception as e:
-        print(f"⚠️ No se pudo restaurar log previo: {e}")
-        clear_local_log()
+    else:
+        try:
+            try:
+                ws.files.get_metadata(REMOTE_LOG_PATH)
+                print(f"🔄 Historial detectado en Volumen. Restaurando '{LOG_NAME}' a local...")
+                EXIST_LOG = True
+            except:
+                clear_local_log()
+            
+            if EXIST_LOG:
+                response = ws.files.download(REMOTE_LOG_PATH) 
+                with open(LOCAL_LOG_PATH, 'wb') as f_local:
+                    shutil.copyfileobj(response.contents, f_local)        
+        except Exception as e:
+            print(f"⚠️ No se pudo restaurar log previo: {e}")
+            clear_local_log()
 
     REMOTE_LOG_PATH = f"{BASE_VOLUME_PATH}/Logs/{LOG_NAME}"
 
