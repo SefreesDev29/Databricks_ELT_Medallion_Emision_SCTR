@@ -66,4 +66,4 @@ resources:
         git_branch: main
 
       tags:
-        WorkFlow_SCTR_YAML_V1: "Proceso ETL Medallion Emisión SCTR - YAML Managed"
+        WorkFlow_SCTR_YAML_V1: Proceso ETL Medallion Emision SCTR - YAML Managed
