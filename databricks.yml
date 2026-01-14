@@ -5,6 +5,9 @@
 bundle:
   name: Proyecto_ETL_Emision_SCTR_Databricks
 
+include:
+  - resources/*.yml
+
 targets:
   dev:
     mode: development
@@ -17,3 +20,50 @@ targets:
   # prod:
   #   workspace:
   #     host: https://dbc-6bd4bd13-6bec.cloud.databricks.com
+
+
+resources:
+  jobs:
+    SCTR_Pipeline_Parametrizado_YAML_Managed:
+      name: SCTR_Pipeline_Parametrizado_YAML_Managed
+      parameters:
+        - name: ON_DEMAND
+          default: "False"
+        - name: DATE_PROCESS
+          default: ""
+
+      schedule:
+        quartz_cron_expression: 2 20 11 ? * Wed
+        timezone_id: "America/Lima"
+        pause_status: UNPAUSED
+
+      tasks:
+        - task_key: 1_Ingesta_Bronze
+          notebook_task:
+            notebook_path: LoadBronze
+            source: GIT 
+          existing_cluster_id: 0102-190343-jcacerrl
+
+        - task_key: 2_Limpieza_Silver
+          depends_on:
+            - task_key: 1_Ingesta_Bronze
+          notebook_task:
+            notebook_path: LoadSilver
+            source: GIT
+          existing_cluster_id: 0102-190343-jcacerrl
+
+        - task_key: 3_Consolidado_Gold
+          depends_on:
+            - task_key: 2_Limpieza_Silver
+          notebook_task:
+            notebook_path: LoadGold
+            source: GIT
+          existing_cluster_id: 0102-190343-jcacerrl
+      
+      git_source:
+        git_url: https://github.com/SefreesDev29/Databricks_ELT_Medallion_Emision_SCTR.git
+        git_provider: gitHub
+        git_branch: main
+
+      tags:
+        WorkFlow_SCTR_YAML_V1: "Proceso ETL Medallion Emisión SCTR - YAML Managed"

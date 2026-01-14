@@ -4,7 +4,8 @@ import time
 import threading
 import shutil
 import gc
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 import pandas as pd 
 from loguru import logger
@@ -18,6 +19,9 @@ from pyspark.sql import SparkSession
 os.environ['TZ'] = 'America/Lima'
 if hasattr(time, 'tzset'):
     time.tzset()
+
+# print(f"Hora de ejecución (UTC): {datetime.now(tz = timezone.utc)}")
+# hora_chile = datetime.now(tz=ZoneInfo("America/Santiago"))
 
 ws = None
 IS_CLOUD = os.getenv('DATABRICKS_RUNTIME_VERSION') is not None
@@ -33,9 +37,7 @@ if not IS_CLOUD:
 
 spark = SparkSession.builder.getOrCreate()
 
-# print(f"Hora de ejecución (UTC): {datetime.now(tz = timezone.utc)}")
-
-HORA_INICIAL, HORA_FINAL = datetime.now(), datetime.now()
+HORA_INICIAL, HORA_FINAL = datetime.now(), datetime.today()
 PERIODO = HORA_INICIAL.date()
 
 DATE_FORMATS = ["yyyy-MM-dd", "dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyyMMdd", "dd/MM/yy"]
