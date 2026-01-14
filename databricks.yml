@@ -3,7 +3,7 @@
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 # databricks bundle validate
 # databricks bundle deploy
-# databricks bundle run SCTR_Pipeline_Parametrizado_YAML_Managed --params "ON_DEMAND='True',DATE_PROCESS='2026-01-14'"
+# databricks bundle run SCTR_Pipeline_Parametrizado_YAML --params "ON_DEMAND='True',DATE_PROCESS='2026-01-14'"
 
 bundle:
   name: Proyecto_ETL_Emision_SCTR_Databricks
@@ -18,17 +18,64 @@ targets:
     workspace:
       host: https://dbc-6bd4bd13-6bec.cloud.databricks.com
 
-  ## Optionally, there could be 'staging' or 'prod' targets here.
-  #
-  # prod:
-  #   workspace:
-  #     host: https://dbc-6bd4bd13-6bec.cloud.databricks.com
+  # Prueba
+  qa:
+    mode: production 
+    workspace:
+      host: https://dbc-qa-url.com 
+      root_path: /Users/jenkins_bot/bundles/sctr
+    
+    resources:
+      jobs:
+        SCTR_Pipeline_Parametrizado_YAML:
+          parameters: 
+            - name: ON_DEMAND
+              default: "True"
+            - name: DATE_PROCESS
+              default: "2026-01-14"
+          
+          job_clusters:
+            - job_cluster_key: job_cluster
+              new_cluster:
+                spark_version: "15.4.x-scala2.12"
+                node_type_id: "Standard_DS3_v2"
+                num_workers: 1
 
+  # Prueba
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-prod-url.com
+    
+    run_as:
+      service_principal_name: "a1b2c3d4-robot-app-id" 
+
+    permissions:
+      - level: CAN_VIEW
+        group_name: "data_engineers"
+      - level: CAN_MANAGE
+        user_name: "sebas@empresa.com"
+
+    resources:
+      jobs:
+        SCTR_Pipeline_Parametrizado_YAML:
+          schedule:
+            quartz_cron_expression: 2 20 11 ? * Wed
+            timezone_id: "America/Lima"
+            pause_status: UNPAUSED
+          
+          job_clusters:
+            - job_cluster_key: job_cluster
+              new_cluster:
+                spark_version: "15.4.x-scala2.12"
+                node_type_id: "Standard_DS4_v2"
+                num_workers: 2
+                autotermination_minutes: 10
 
 resources:
   jobs:
-    SCTR_Pipeline_Parametrizado_YAML_Managed:
-      name: SCTR_Pipeline_Parametrizado_YAML_Managed
+    SCTR_Pipeline_Parametrizado_YAML:
+      name: SCTR_Pipeline_Parametrizado_YAML
       parameters:
         - name: ON_DEMAND
           default: "False"
@@ -69,4 +116,4 @@ resources:
         git_branch: main
 
       tags:
-        WorkFlow_SCTR_YAML_V1: Proceso ETL Medallion Emision SCTR - YAML Managed
+        Job_SCTR_YAML_V1: Proceso ETL Medallion Emision SCTR - YAML
