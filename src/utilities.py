@@ -15,6 +15,10 @@ from pyspark.sql import DataFrame
 from delta.tables import DeltaTable
 from pyspark.sql import SparkSession
 
+os.environ['TZ'] = 'America/Lima'
+if hasattr(time, 'tzset'):
+    time.tzset()
+
 ws = None
 IS_CLOUD = os.getenv('DATABRICKS_RUNTIME_VERSION') is not None
 
@@ -24,16 +28,12 @@ if not IS_CLOUD:
     from databricks.sdk.runtime import dbutils
     from databricks.sdk import WorkspaceClient
     from databricks.sdk.errors import ResourceDoesNotExist
+
     ws = WorkspaceClient()
 
 spark = SparkSession.builder.getOrCreate()
-# os.environ['TZ'] = 'America/Lima'
-# time.tzset()
 
 # print(f"Hora de ejecución (UTC): {datetime.now(tz = timezone.utc)}")
-
-spark.conf.set("spark.sql.session.timeZone", "America/Lima")
-spark.conf.set("spark.sql.shuffle.partitions", "16")
 
 HORA_INICIAL, HORA_FINAL = datetime.now(), datetime.now()
 PERIODO = HORA_INICIAL.date()
@@ -41,6 +41,7 @@ PERIODO = HORA_INICIAL.date()
 DATE_FORMATS = ["yyyy-MM-dd", "dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyyMMdd", "dd/MM/yy"]
 BASE_VOLUME_PATH = "/Volumes/landing_dev/sctr_emision/inputs_volumen"
 
+NUM_PARTITIONS = 16
 BASE_NAME = None
 LOG_NAME = None
 LOCAL_LOG_PATH = None
@@ -48,6 +49,10 @@ REMOTE_LOG_PATH = None
 FILE_HANDLER_ID = None
 _STOP_SYNC = False
 _SYNC_THREAD: threading.Thread = None
+
+def set_config_spark(num_partitions: int = 16):
+    spark.conf.set("spark.sql.session.timeZone", "America/Lima")
+    spark.conf.set("spark.sql.shuffle.partitions", str(num_partitions))
 
 def custom_format_log(type_process: int):
     def formatter(record: dict):
@@ -230,3 +235,12 @@ def save_to_table_delta(df: DataFrame, table_name: str, mode="overwrite", mergeS
     except Exception as e:
         logger.error(f"   ❌ Error en Guardar Tabla Delta {table_name}: {e}")
         return False
+    
+def finalize_process():
+    global HORA_FINAL
+    HORA_FINAL = datetime.now()
+    difference_time = HORA_FINAL-HORA_INICIAL
+    total_seconds = int(difference_time.total_seconds())
+    difference_formated = "{} minuto(s), {} segundo(s)".format((total_seconds // 60), total_seconds % 60)
+    logger.info(f"Tiempo de proceso: {difference_formated}")
+    close_log()
