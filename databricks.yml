@@ -1,6 +1,9 @@
 # This is a Databricks asset bundle definition for Proyecto_ETL_Emision_SCTR_Databricks.
 # The Databricks extension requires databricks.yml configuration file.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+# databricks bundle validate
+# databricks bundle deploy
+# databricks bundle run SCTR_Pipeline_Parametrizado_YAML_Managed --params "ON_DEMAND='True',DATE_PROCESS='2026-01-14'"
 
 bundle:
   name: Proyecto_ETL_Emision_SCTR_Databricks
