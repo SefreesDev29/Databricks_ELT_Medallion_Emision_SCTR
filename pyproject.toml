@@ -1,7 +1,7 @@
 [project]
 name = "proyecto-etl-emision-sctr-databricks"
 version = "0.1.0"
-description = "Add your description here"
+description = "Este proyecto implementa una arquitectura ELT usando PySpark con Databricks Connect para el procesamiento masivo de archivos Excel de pólizas SCTR."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
