@@ -251,7 +251,8 @@ def set_job_task_value(key: str, value):
     try:
         dbutils.jobs.taskValues.set(key=key, value=value)
         logger.info(f"   📤 TaskValue Set: {key} = {value}")
-    except Exception:
+    except Exception as e:
+        logger.warning(f"   ℹ️ Error en TaskValue Set: {key} = {value}. {e}")
         pass
 
 def get_job_task_value(task_key: str, key: str, default_value) -> int:
