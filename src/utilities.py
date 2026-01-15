@@ -246,3 +246,18 @@ def finalize_process():
     difference_formated = "{} minuto(s), {} segundo(s)".format((total_seconds // 60), total_seconds % 60)
     logger.info(f"Tiempo de proceso: {difference_formated}")
     close_log()
+
+def set_job_task_value(key: str, value):
+    try:
+        dbutils.jobs.taskValues.set(key=key, value=value)
+        logger.info(f"   📤 TaskValue Set: {key} = {value}")
+    except Exception:
+        pass
+
+def get_job_task_value(task_key: str, key: str, default_value) -> int:
+    try:
+        val = int(dbutils.jobs.taskValues.get(taskKey=task_key, key=key, default=default_value))
+        logger.info(f"   📥 TaskValue Get: {key} = {val} (Desde {task_key})")
+        return val
+    except Exception:
+        return default_value
